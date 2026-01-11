@@ -484,10 +484,12 @@ overflow-y:auto;
               <div class="summaryLine" style="border-bottom:none;"><span>Food vibe</span><b id="sumFood">—</b></div>
             </div>
 
-            <div class="btnRow" style="margin-top:16px;">
-              <button class="btnPrimary" id="btnCopy">Copy summary</button>
-              <button class="btnGhost" id="btnRestart">Again!</button>
-            </div>
+           <div class="btnRow" style="margin-top:16px;">
+  <button class="btnPrimary" id="btnCopy">Copy summary</button>
+  <button class="btnGhost" id="btnEmail">Send to Jeremy ✉️</button>
+  <button class="btnSoft" id="btnRestart">Again!</button>
+</div>
+
 
             <p class="tinyNote">you got money right...</p>
           </section>
@@ -751,6 +753,18 @@ Food vibe: ${state.food}`;
       alert("Copy failed 😅 Just screenshot it!");
     }
   });
+$("#btnEmail").addEventListener("click", () => {
+  const subject = "Date Plan 💙";
+  const body =
+`It’s a date 💙
+Date: ${state.date}
+Time: ${state.time}
+Dress code: Flannel / patterned top
+Food vibe: ${state.food}`;
+
+  const mailto = `mailto:jeremyjtseng@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+});
 
   $("#btnRestart").addEventListener("click", () => {
     state.date = null; state.time=""; state.food="";
@@ -777,6 +791,7 @@ Food vibe: ${state.food}`;
 </script>
 </body>
 </html>
+
 
 
 
