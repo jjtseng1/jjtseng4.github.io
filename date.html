@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>date request</title>
+  <style>
+    :root{
+      --primary:#77b5f7;
+      --primary-2:#5aa3f2;
+      --bg1:#f8fbff;
+      --bg2:#eef6ff;
+      --card:#ffffff;
+      --text:#1d2a3a;
+      --muted:#5a6b7d;
+      --shadow: 0 18px 40px rgba(18, 44, 76, .12);
+      --radius: 22px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(119,181,247,.25), transparent 60%),
+        radial-gradient(900px 500px at 80% 20%, rgba(119,181,247,.18), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+.screenTopRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.btnBackMini{
+  padding:10px 12px;
+  border-radius: 12px;
+  background: rgba(119,181,247,.10);
+  color: var(--primary-2);
+  border: 1px solid rgba(119,181,247,.35);
+  font-weight: 900;
+}
+
+
+    /* Floating hearts background */
+    .hearts{
+      position:fixed; inset:0; pointer-events:none; overflow:hidden;
+      opacity:.85;
+    }
+    .heart{
+      position:absolute;
+      width:10px; height:10px;
+      background: rgba(119,181,247,.45);
+      transform: rotate(45deg);
+      border-radius: 2px;
+      filter: blur(.2px);
+      animation: floatUp linear infinite;
+    }
+    .heart::before, .heart::after{
+      content:"";
+      position:absolute;
+      width:10px; height:10px;
+      background: rgba(119,181,247,.45);
+      border-radius:50%;
+    }
+    .heart::before{ left:-5px; top:0; }
+    .heart::after{ left:0; top:-5px; }
+    @keyframes floatUp{
+      from{ transform: translateY(110vh) rotate(45deg); opacity:0; }
+      10%{ opacity:.9; }
+      to{ transform: translateY(-25vh) rotate(45deg); opacity:0; }
+    }
+
+    /* Layout */
+    .wrap{
+      position:relative;
+      height:100%;
+      display:grid;
+      place-items:center;
+      padding:24px;
+    }
+
+    .card{
+      width:min(920px, 92vw);
+      min-height: min(620px, 82vh);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(119,181,247,.25);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:18px 20px;
+      border-bottom: 1px solid rgba(119,181,247,.16);
+      background: linear-gradient(90deg, rgba(119,181,247,.14), transparent 60%);
+    }
+
+    .brand{
+      display:flex; gap:10px; align-items:center;
+      font-weight:800;
+      letter-spacing:.3px;
+    }
+    .dot{
+      width:12px;height:12px;border-radius:50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 6px rgba(119,181,247,.18);
+    }
+    .progress{
+      font-size:12px; color:var(--muted);
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(119,181,247,.28);
+      background: rgba(119,181,247,.08);
+      color: var(--primary-2);
+      font-weight:700;
+    }
+
+    .content{
+      padding: 26px 22px 30px;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:18px;
+      height: calc(100% - 58px);
+    }
+
+    @media (max-width: 860px){
+      .content{ grid-template-columns: 1fr; height:auto; }
+      .card{ min-height: unset; }
+    }
+
+    .panel{
+      border-radius: 18px;
+      border: 1px solid rgba(119,181,247,.18);
+      background: rgba(255,255,255,.75);
+      box-shadow: 0 10px 30px rgba(18,44,76,.07);
+      padding: 18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .title{
+      font-size: clamp(22px, 2.5vw, 34px);
+      margin:0 0 8px;
+      line-height:1.08;
+    }
+    .subtitle{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size: 15px;
+      line-height:1.45;
+    }
+
+    .btnRow{ display:flex; gap:12px; flex-wrap:wrap; }
+
+    button{
+      appearance:none; border:0; cursor:pointer;
+      font-weight:800;
+      border-radius: 14px;
+      padding: 12px 16px;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+      user-select:none;
+    }
+    button:active{ transform: translateY(1px) scale(.99); }
+
+    .btnPrimary{
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+      color:white;
+      box-shadow: 0 14px 26px rgba(119,181,247,.35);
+    }
+    .btnPrimary:hover{ box-shadow: 0 18px 34px rgba(119,181,247,.42); }
+
+    .btnGhost{
+      background: rgba(119,181,247,.10);
+      color: var(--primary-2);
+      border: 1px solid rgba(119,181,247,.35);
+    }
+
+    .btnSoft{
+      background: rgba(255,255,255,.75);
+      color: var(--text);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+
+    /* Sticker column */
+    .stickerBox{
+      display:grid;
+      gap:14px;
+      align-content:start;
+    }
+
+    .stickerFrame{
+      border-radius: 18px;
+      border: 1px dashed rgba(119,181,247,.35);
+      background: rgba(119,181,247,.06);
+      padding: 12px;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      position:relative;
+      min-height: 210px;
+    }
+    .stickerFrame img{
+      width:100%;
+      max-height: 280px;
+      object-fit:contain;
+      filter: drop-shadow(0 16px 20px rgba(18,44,76,.12));
+    }
+
+    .tinyNote{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+      line-height:1.35;
+    }
+
+    /* scattered stickers on page */
+    .scatter{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.25;
+    }
+    .scatter img{
+      position:absolute;
+      width:110px;
+      filter: drop-shadow(0 10px 14px rgba(18,44,76,.10));
+      animation: bob 3.8s ease-in-out infinite;
+    }
+    @keyframes bob{
+      0%,100%{ transform: translateY(0px) rotate(var(--r)); }
+      50%{ transform: translateY(-10px) rotate(var(--r)); }
+    }
+
+    /* calendar */
+    .calendar{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:10px;
+      margin-top: 10px;
+    }
+    .calHead{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      opacity: .85;
+    }
+    .day{
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.06);
+      background: rgba(255,255,255,.7);
+      padding: 12px 10px;
+      text-align:center;
+      font-weight: 800;
+      color: rgba(29,42,58,.8);
+      cursor: not-allowed;
+      opacity:.35;
+      position:relative;
+      overflow:hidden;
+    }
+    .day.available{
+      cursor:pointer;
+      opacity:1;
+      border: 1px solid rgba(119,181,247,.55);
+      background: rgba(119,181,247,.12);
+      color: var(--primary-2);
+      box-shadow: 0 10px 24px rgba(119,181,247,.22);
+    }
+    .day.available:hover{
+      background: rgba(119,181,247,.16);
+    }
+    .day.selected{
+      background: linear-gradient(180deg, rgba(119,181,247,.25), rgba(119,181,247,.10));
+      border: 2px solid rgba(119,181,247,.75);
+      color: var(--text);
+    }
+    .day .tag{
+      position:absolute;
+      left:8px; top:8px;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 4px 7px;
+      border-radius:999px;
+      background: rgba(119,181,247,.20);
+      color: var(--primary-2);
+      border: 1px solid rgba(119,181,247,.30);
+    }
+
+    /* choice cards */
+    .choices{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 520px){
+      .choices{ grid-template-columns: 1fr; }
+    }
+
+    .choice{
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid rgba(119,181,247,.20);
+      background: rgba(255,255,255,.72);
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .choice:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(18,44,76,.10);
+      background: rgba(119,181,247,.07);
+    }
+    .choice.selected{
+      border: 2px solid rgba(119,181,247,.75);
+      background: rgba(119,181,247,.10);
+    }
+    .choice .left{
+      display:flex; flex-direction:column; gap:2px;
+    }
+    .choice .name{ font-weight: 900; }
+    .choice .desc{ font-size: 12px; color: var(--muted); }
+    .badge{
+      font-size: 12px;
+      font-weight: 900;
+      padding: 8px 10px;
+      border-radius: 12px;
+      color: white;
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+      box-shadow: 0 10px 18px rgba(119,181,247,.35);
+      white-space:nowrap;
+    }
+
+    /* fade transitions between screens */
+    .screen{ display:none; }
+    .screen.active{ display:block; animation: fadeIn .28s ease; }
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    /* summary */
+    .summaryLine{
+      display:flex; justify-content:space-between; gap:12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(119,181,247,.14);
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .summaryLine b{ color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="scatter" id="scatter"></div>
+
+      <div class="topbar">
+        <div class="brand">
+          <span class="dot"></span>
+          <span>date 💙</span>
+        </div>
+        <div class="progress">
+          <span class="pill" id="stepPill">Step 1/4</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <!-- LEFT -->
+        <div class="panel">
+          <!-- Screen 1 -->
+          <section class="screen active" id="screen-ask">
+            <h1 class="title">will you go on a date with me?</h1>
+            <p class="subtitle">
+              answer carefully
+            </p>
+            <div class="btnRow">
+              <button class="btnPrimary" id="btnYes">I’d love to!</button>
+              <button class="btnGhost" id="btnNo">...</button>
+            </div>
+            <p class="tinyNote">there is only one correct answer 😇</p>
+          </section>
+
+          <!-- Screen 2 (No trap) -->
+          <section class="screen" id="screen-nope">
+            <h1 class="title">Too bad — you’re coming with me 😌</h1>
+            <p class="subtitle">Say sorry.</p>
+            <div class="btnRow">
+              <button class="btnPrimary" id="btnSorry">Okay fine I’m sorry 🙄</button>
+              <button class="btnSoft" id="btnReconsider">Wait… I changed my mind 😳</button>
+            </div>
+            <p class="tinyNote">are you serious...</p>
+          </section>
+
+          <!-- Screen 3 (Calendar + time + dress code) -->
+          <section class="screen" id="screen-calendar">
+            <h1 class="title">Choose a date!</h1>
+            <p class="subtitle">
+              
+            </p>
+
+            <div class="calHead">
+              <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+            </div>
+            <div class="calendar" id="calendar"></div>
+
+            <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+              <div style="flex:1; min-width: 220px;">
+                <div style="font-size:12px; color:var(--muted); font-weight:800; margin-bottom:6px;">Pick a time</div>
+                <select id="timeSelect" style="
+                  width:100%; padding:12px 14px; border-radius:14px;
+                  border:1px solid rgba(119,181,247,.30);
+                  background: rgba(255,255,255,.75);
+                  font-weight:800; color: var(--text);
+                  outline:none;
+                ">
+                  <option value="">Select a time…</option>
+                  <option>5:00 PM</option>
+                  <option>5:30 PM</option>
+                  <option>6:00 PM</option>
+                  <option>6:30 PM</option>
+                  <option>7:00 PM</option>
+                  <option>7:30 PM</option>
+                  <option>8:00 PM</option>
+                </select>
+              </div>
+
+              <button class="btnPrimary" id="btnToFood" disabled>Next 💙</button>
+            </div>
+
+            <p class="tinyNote" id="calHint">select <b>1/17</b> and a time to continue.</p>
+          </section>
+
+          <!-- Screen 4 (Food) -->
+          <section class="screen" id="screen-food">
+            <h1 class="title">What are you craving?</h1>
+            <p class="subtitle"></p>
+
+            <div class="choices" id="foodChoices"></div>
+
+            <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap;">
+              <button class="btnGhost" id="btnBackToCal">Back</button>
+              <button class="btnPrimary" id="btnFinish" disabled>Make it official!</button>
+            </div>
+          </section>
+
+          <!-- Screen 5 (Summary) -->
+          <section class="screen" id="screen-done">
+            <h1 class="title">It’s a date!</h1>
+            <p class="subtitle">I'm so excited; here's the plan!</p>
+
+            <div style="margin-top:10px;">
+              <div class="summaryLine"><span>Date</span><b id="sumDate">—</b></div>
+              <div class="summaryLine"><span>Time</span><b id="sumTime">—</b></div>
+              <div class="summaryLine"><span>Dress code</span><b>Flannel / patterned top</b></div>
+              <div class="summaryLine" style="border-bottom:none;"><span>Food vibe</span><b id="sumFood">—</b></div>
+            </div>
+
+            <div class="btnRow" style="margin-top:16px;">
+              <button class="btnPrimary" id="btnCopy">Copy summary</button>
+              <button class="btnGhost" id="btnRestart">Again!</button>
+            </div>
+
+            <p class="tinyNote">you got money right...</p>
+          </section>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="stickerBox">
+          <div class="stickerFrame">
+            <img id="rightSticker" alt="cute sticker" />
+          </div>
+          <div class="panel">
+            <div style="font-weight:900; margin-bottom:6px;">Rules</div>
+            <div style="color:var(--muted); font-size:13px; line-height:1.45;">
+              1) no take backs<br/>
+              2) dress code is enforced<br/>
+            </div>
+            <div class="tinyNote" style="margin-top:10px;">
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ====== CONFIG (change filenames here if needed) ======
+  const PRIMARY = "#77b5f7";
+  const STICKERS = [
+    "assets/5.jpg", // bear bouquet
+    "assets/2.jpg", // panda riding
+    "assets/3.jpg", // hug
+    "assets/4.gif"  // study bear gif
+  ];
+  const GIF_NO = "assets/6.gif"; // "too bad you're coming" gif
+
+  // ====== STATE ======
+  const state = {
+    date: null,        // "1/17"
+    time: "",
+    food: ""
+  };
+
+  // ====== UTIL ======
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  function showScreen(id){
+    $$(".screen").forEach(s => s.classList.remove("active"));
+    $(id).classList.add("active");
+    updateStepPill();
+    rotateRightSticker();
+    refreshScatter();
+  }
+
+  function updateStepPill(){
+    const order = ["#screen-ask","#screen-nope","#screen-calendar","#screen-food","#screen-done"];
+    const idx = order.findIndex(id => $(id).classList.contains("active"));
+    const step = Math.max(0, idx);
+    const total = 4; // ask, calendar, food, done (nope is detour)
+    const shown = (idx <= 1) ? 1 : (idx===2 ? 2 : (idx===3 ? 3 : 4));
+    $("#stepPill").textContent = `Step ${shown}/${total}`;
+  }
+
+  // ====== HEARTS ======
+  function spawnHearts(){
+    const container = $("#hearts");
+    const count = 26;
+    for(let i=0;i<count;i++){
+      const h = document.createElement("div");
+      h.className = "heart";
+      const left = Math.random()*100;
+      const delay = Math.random()*6;
+      const dur = 6 + Math.random()*7;
+      const size = 8 + Math.random()*10;
+      h.style.left = left + "vw";
+      h.style.animationDelay = delay + "s";
+      h.style.animationDuration = dur + "s";
+      h.style.width = size + "px";
+      h.style.height = size + "px";
+      h.style.opacity = 0.3 + Math.random()*0.55;
+      container.appendChild(h);
+    }
+  }
+
+  // ====== SCATTERED STICKERS (light background decoration) ======
+  function refreshScatter(){
+    const sc = $("#scatter");
+    sc.innerHTML = "";
+    const activeId = $$(".screen").find(s => s.classList.contains("active"))?.id || "screen-ask";
+
+    // fewer stickers on mobile to avoid clutter
+    const isMobile = window.matchMedia("(max-width: 860px)").matches;
+    const n = isMobile ? 3 : 5;
+
+    for(let i=0;i<n;i++){
+      const img = document.createElement("img");
+      img.src = STICKERS[(i + activeId.length) % STICKERS.length];
+      img.style.left = (5 + Math.random()*88) + "%";
+      img.style.top  = (6 + Math.random()*78) + "%";
+      img.style.setProperty("--r", (Math.random()*26 - 13) + "deg");
+      img.style.width = (80 + Math.random()*70) + "px";
+      img.style.opacity = 0.18 + Math.random()*0.12;
+      img.style.animationDuration = (3.2 + Math.random()*2.3) + "s";
+      sc.appendChild(img);
+    }
+  }
+
+  // ====== RIGHT STICKER ROTATION ======
+  let stickerIdx = 0;
+  function rotateRightSticker(){
+    // pick based on current screen for nicer mapping
+    const active = $$(".screen").find(s => s.classList.contains("active"))?.id || "";
+    let chosen = STICKERS[stickerIdx % STICKERS.length];
+
+    if(active === "screen-nope") chosen = GIF_NO;
+    if(active === "screen-done") chosen = "assets/3.jpg";
+
+    $("#rightSticker").src = chosen;
+    stickerIdx++;
+  }
+
+  // ====== SCREEN 1: YES/NO ======
+  $("#btnYes").addEventListener("click", () => {
+    showScreen("#screen-calendar");
+  });
+
+  $("#btnNo").addEventListener("click", () => {
+    // show detour screen & swap sticker to the "no" gif
+    $("#rightSticker").src = GIF_NO;
+    showScreen("#screen-nope");
+  });
+
+  $("#btnSorry").addEventListener("click", () => showScreen("#screen-calendar"));
+  $("#btnReconsider").addEventListener("click", () => showScreen("#screen-calendar"));
+
+  // ====== SCREEN 3: CALENDAR (ONLY 1/17 ENABLED) ======
+  function buildCalendar(){
+    const cal = $("#calendar");
+    cal.innerHTML = "";
+
+    // January layout (simple): 31 days, with an offset so it looks like a real month.
+    // You asked to blackout everything except 1/17 — so this is a "locked" January.
+    // Offset is just aesthetic; it doesn't need to match a specific year.
+    const offset = 3; // 0=Sun ... 6=Sat. Change if you want different alignment.
+
+    // blanks
+    for(let i=0;i<offset;i++){
+      const blank = document.createElement("div");
+      blank.style.opacity = 0;
+      cal.appendChild(blank);
+    }
+
+    for(let d=1; d<=31; d++){
+      const cell = document.createElement("div");
+      cell.className = "day";
+      cell.textContent = d;
+
+     if(d === 17){
+  cell.classList.add("available");
+
+  cell.addEventListener("click", () => {
+    $$(".day").forEach(x => x.classList.remove("selected"));
+    cell.classList.add("selected");
+    state.date = "1/17";
+    updateCalendarNext();
+  });
+cell.addEventListener("click", () => {
+  $$(".day").forEach(x => x.classList.remove("selected"));
+  cell.classList.add("selected");
+  state.date = "1/17";
+
+  // force pull the current selected time (even if user selected it earlier)
+  state.time = $("#timeSelect").value;
+
+  updateCalendarNext();
+});
+
+}
+
+
+      cal.appendChild(cell);
+    }
+  }
+
+  function updateCalendarNext(){
+    const hasDate = !!state.date;
+    const time = $("#timeSelect").value;
+    state.time = time;
+    const hasTime = !!time;
+
+    const btn = $("#btnToFood");
+    btn.disabled = !(hasDate && hasTime);
+
+    $("#calHint").innerHTML = btn.disabled
+      ? `Select <b>1/17</b> and a time to continue.`
+      : `Perfect 😌 Click <b>Next</b>.`;
+  }
+
+  $("#timeSelect").addEventListener("change", updateCalendarNext);
+
+  $("#btnToFood").addEventListener("click", () => {
+    if(!state.date || !state.time) return;
+    showScreen("#screen-food");
+  });
+
+  // ====== SCREEN 4: FOOD CHOICES ======
+  const FOOD_OPTIONS = [
+    { name: "Mexican",  desc: "tacos / burritos / salsa", badge: "🌮" },
+    { name: "Italian",  desc: "pasta / pizza / cozy",      badge: "🍝" },
+    { name: "Chinese",  desc: "noodles / dumplings",       badge: "🥟" },
+    { name: "Anything", desc: "i got you",     badge: "✨" },
+    { name: "Sushi",    desc: "rolls & aluminum foil",             badge: "🍣" },
+    { name: "Dessert",  desc: "sweet treat",        badge: "🍰" },
+  ];
+
+  function renderFood(){
+    const box = $("#foodChoices");
+    box.innerHTML = "";
+
+    FOOD_OPTIONS.forEach((opt) => {
+      const el = document.createElement("div");
+      el.className = "choice";
+      el.innerHTML = `
+        <div class="left">
+          <div class="name">${opt.name}</div>
+          <div class="desc">${opt.desc}</div>
+        </div>
+        <div class="badge">${opt.badge}</div>
+      `;
+
+      el.addEventListener("click", () => {
+        $$(".choice").forEach(c => c.classList.remove("selected"));
+        el.classList.add("selected");
+        state.food = opt.name;
+        $("#btnFinish").disabled = false;
+      });
+
+      box.appendChild(el);
+    });
+  }
+
+  $("#btnBackToCal").addEventListener("click", () => showScreen("#screen-calendar"));
+
+  $("#btnFinish").addEventListener("click", () => {
+    if(!state.food) return;
+    $("#sumDate").textContent = state.date || "—";
+    $("#sumTime").textContent = state.time || "—";
+    $("#sumFood").textContent = state.food || "—";
+    showScreen("#screen-done");
+  });
+
+  // ====== SUMMARY ACTIONS ======
+  $("#btnCopy").addEventListener("click", async () => {
+    const txt =
+`It’s a date 💙
+Date: ${state.date}
+Time: ${state.time}
+Dress code: Flannel / patterned top
+Food vibe: ${state.food}`;
+    try{
+      await navigator.clipboard.writeText(txt);
+      $("#btnCopy").textContent = "Copied ✅";
+      setTimeout(()=> $("#btnCopy").textContent = "Copy summary", 1200);
+    }catch(e){
+      alert("Copy failed 😅 Just screenshot it!");
+    }
+  });
+
+  $("#btnRestart").addEventListener("click", () => {
+    state.date = null; state.time=""; state.food="";
+    $("#timeSelect").value = "";
+    showScreen("#screen-ask");
+    buildCalendar();
+    renderFood();
+    updateCalendarNext();
+  });
+
+  // ====== INIT ======
+  function init(){
+    spawnHearts();
+    buildCalendar();
+    renderFood();
+    rotateRightSticker();
+    refreshScatter();
+    updateCalendarNext();
+    updateStepPill();
+  }
+
+  init();
+  window.addEventListener("resize", refreshScatter);
+</script>
+</body>
+</html>
