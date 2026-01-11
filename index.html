@@ -27,7 +27,10 @@
         radial-gradient(1200px 600px at 20% 10%, rgba(119,181,247,.25), transparent 60%),
         radial-gradient(900px 500px at 80% 20%, rgba(119,181,247,.18), transparent 55%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
-      overflow:hidden;
+      overflow-x:hidden;
+overflow-y:auto;
+-webkit-overflow-scrolling: touch;
+
     }
 .screenTopRow{
   display:flex;
@@ -414,6 +417,11 @@
 
           <!-- Screen 3 (Calendar + time + dress code) -->
           <section class="screen" id="screen-calendar">
+            <div class="screenTopRow">
+  <button class="btnBackMini" id="btnBackToAsk">← Back</button>
+  <span></span>
+</div>
+
             <h1 class="title">Choose a date!</h1>
             <p class="subtitle">
               
@@ -615,6 +623,7 @@
 
   $("#btnSorry").addEventListener("click", () => showScreen("#screen-calendar"));
   $("#btnReconsider").addEventListener("click", () => showScreen("#screen-calendar"));
+$("#btnBackToAsk").addEventListener("click", () => showScreen("#screen-ask"));
 
   // ====== SCREEN 3: CALENDAR (ONLY 1/17 ENABLED) ======
   function buildCalendar(){
@@ -638,27 +647,21 @@
       cell.className = "day";
       cell.textContent = d;
 
-     if(d === 17){
+    if (d === 17) {
   cell.classList.add("available");
 
   cell.addEventListener("click", () => {
     $$(".day").forEach(x => x.classList.remove("selected"));
     cell.classList.add("selected");
     state.date = "1/17";
+
+    // pull currently selected time (even if chosen before clicking date)
+    state.time = $("#timeSelect").value;
+
     updateCalendarNext();
   });
-cell.addEventListener("click", () => {
-  $$(".day").forEach(x => x.classList.remove("selected"));
-  cell.classList.add("selected");
-  state.date = "1/17";
-
-  // force pull the current selected time (even if user selected it earlier)
-  state.time = $("#timeSelect").value;
-
-  updateCalendarNext();
-});
-
 }
+
 
 
       cal.appendChild(cell);
@@ -774,5 +777,6 @@ Food vibe: ${state.food}`;
 </script>
 </body>
 </html>
+
 
 
